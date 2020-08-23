@@ -41,6 +41,7 @@ class Tela_BaseState extends State<TelaBase> {
                   'Maria',
                   style: TextStyle(
                     color: Colors.blueAccent,
+                    fontSize: 20,
                   ),
                 ),
               ],

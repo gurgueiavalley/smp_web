@@ -1,14 +1,14 @@
-class Instituicao {
+class InstituicaoModel {
   Data _data;
 
-  Instituicao({Data data}) {
+  InstituicaoModel({Data data}) {
     this._data = data;
   }
 
   Data get data => _data;
   set data(Data data) => _data = data;
 
-  Instituicao.fromJson(Map<String, dynamic> json) {
+  InstituicaoModel.fromJson(Map<String, dynamic> json) {
     _data = json['data'] != null ? new Data.fromJson(json['data']) : null;
   }
 
@@ -51,40 +51,47 @@ class Data {
 }
 
 class Instituicoes {
-  String _descricao;
   int _id;
-  String _img;
   String _nome;
+  String _descricao;
+  String _img;
+  String _nomeImg;
 
-  Instituicoes({String descricao, int id, String img, String nome}) {
-    this._descricao = descricao;
+  Instituicoes(
+      {int id, String nome, String descricao, String img, String nomeImg}) {
     this._id = id;
-    this._img = img;
     this._nome = nome;
+    this._descricao = descricao;
+    this._img = img;
+    this._nomeImg = nomeImg;
   }
 
-  String get descricao => _descricao;
-  set descricao(String descricao) => _descricao = descricao;
   int get id => _id;
   set id(int id) => _id = id;
-  String get img => _img;
-  set img(String img) => _img = img;
   String get nome => _nome;
   set nome(String nome) => _nome = nome;
+  String get descricao => _descricao;
+  set descricao(String descricao) => _descricao = descricao;
+  String get img => _img;
+  set img(String img) => _img = img;
+  String get nomeImg => _nomeImg;
+  set nomeImg(String nomeImg) => _nomeImg = nomeImg;
 
   Instituicoes.fromJson(Map<String, dynamic> json) {
-    _descricao = json['descricao'];
     _id = json['id'];
-    _img = json['img'];
     _nome = json['nome'];
+    _descricao = json['descricao'];
+    _img = json['img'];
+    _nomeImg = json['nomeImg'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['descricao'] = this._descricao;
     data['id'] = this._id;
-    data['img'] = this._img;
     data['nome'] = this._nome;
+    data['descricao'] = this._descricao;
+    data['img'] = this._img;
+    data['nomeImg'] = this._nomeImg;
     return data;
   }
 }

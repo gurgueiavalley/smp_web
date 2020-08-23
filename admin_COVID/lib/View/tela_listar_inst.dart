@@ -1,4 +1,7 @@
+import 'package:admin_chat/Model/instituicao.dart';
+import 'package:admin_chat/Query/queryInstituicao.dart';
 import 'package:admin_chat/View/tela_instituicoes.dart';
+import 'package:admin_chat/constants.dart';
 import 'package:flutter/material.dart';
 
 class TelaListarInstituicao extends StatefulWidget {
@@ -8,6 +11,7 @@ class TelaListarInstituicao extends StatefulWidget {
 
 class _TelaListarInstituicaoState extends State<TelaListarInstituicao> {
   ScrollController _scrollController = ScrollController();
+  TextEditingController _editingController = TextEditingController();
   bool _inicio = false;
 
   @override
@@ -56,12 +60,7 @@ class _TelaListarInstituicaoState extends State<TelaListarInstituicao> {
                     foregroundColor: Colors.white,
                     hoverColor: Colors.redAccent,
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => TelaInstituicao(),
-                        ),
-                      );
+                      Navigator.pushNamed(context, 'cadastrar_instituicao');
                     },
                     label: Text('Adicionar nova Instituição'),
                     icon: Icon(Icons.add),
@@ -90,25 +89,98 @@ class _TelaListarInstituicaoState extends State<TelaListarInstituicao> {
                         Container(
                           height: 100,
                           child: TextField(
+                            onChanged: (value) {
+                              setState(() {
+                                print(value);
+                              });
+                            },
+                            controller: _editingController,
                             decoration: InputDecoration(
-                              prefixIcon: Icon(
-                                Icons.search,
-                              ),
-                              hintText: 'Digite o nome da Instituição',
-                            ),
+                                prefixIcon: Icon(
+                                  Icons.search,
+                                ),
+                                hintText: 'Digite o nome da Instituição',
+                                suffixIcon: IconButton(
+                                  icon: Icon(Icons.clear),
+                                  onPressed: () {
+                                    _editingController.clear();
+                                    setState(() {});
+                                  },
+                                )),
                           ),
                         ),
-                        for (var i = 0; i < 25; i++)
-                          ListTile(
-                            title: Text('Instituição'),
-                            leading: CircleAvatar(),
-                            subtitle: Text('Descrição'),
-                            onTap: () {},
-                            trailing: IconButton(
-                              icon: Icon(Icons.edit),
-                              onPressed: () {},
-                            ),
-                          )
+                        StreamBuilder(
+                          stream: hasuraConnect
+                              .subscription(InstituicaoQuery().listar()),
+                          builder: (_, d) {
+                            if (d.hasData) {
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: InstituicaoModel.fromJson(d.data)
+                                    .data
+                                    .instituicoes
+                                    .length,
+                                itemBuilder: (_, i) {
+                                  if (InstituicaoModel.fromJson(d.data)
+                                      .data
+                                      .instituicoes
+                                      .elementAt(i)
+                                      .nome
+                                      .toLowerCase()
+                                      .contains(
+                                        _editingController.text.toLowerCase(),
+                                      )) {
+                                    return ListTile(
+                                      title: Text(
+                                        InstituicaoModel.fromJson(d.data)
+                                            .data
+                                            .instituicoes
+                                            .elementAt(i)
+                                            .nome,
+                                      ),
+                                      leading: CircleAvatar(
+                                        backgroundImage: NetworkImage(
+                                          InstituicaoModel.fromJson(d.data)
+                                              .data
+                                              .instituicoes
+                                              .elementAt(i)
+                                              .img,
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        InstituicaoModel.fromJson(d.data)
+                                            .data
+                                            .instituicoes
+                                            .elementAt(i)
+                                            .descricao,
+                                      ),
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          'alterar_instituicao',
+                                          arguments:
+                                              InstituicaoModel.fromJson(d.data)
+                                                  .data
+                                                  .instituicoes
+                                                  .elementAt(i),
+                                        );
+                                      },
+                                      trailing: Icon(Icons.edit),
+                                    );
+                                  } else {
+                                    return Container();
+                                  }
+                                },
+                              );
+                            } else {
+                              return CircularProgressIndicator(
+                                valueColor: new AlwaysStoppedAnimation<Color>(
+                                  Colors.blue,
+                                ),
+                              );
+                            }
+                          },
+                        ),
                       ],
                     ),
                   ),
