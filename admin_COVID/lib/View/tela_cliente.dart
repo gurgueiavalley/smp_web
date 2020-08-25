@@ -17,6 +17,8 @@ class _TelaClienteState extends State<TelaCliente> {
 
   @override
   Widget build(BuildContext context) {
+    double _largura = MediaQuery.of(context).size.width;
+
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         label: Text('Inicio'),
@@ -41,8 +43,8 @@ class _TelaClienteState extends State<TelaCliente> {
               SizedBox(
                 height: 50,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+              Flex(
+                direction: Axis.horizontal,
                 children: [
                   Icon(Icons.search),
                   SizedBox(
@@ -55,16 +57,29 @@ class _TelaClienteState extends State<TelaCliente> {
                     ),
                   ),
                   Expanded(child: Container()),
-                  FloatingActionButton.extended(
-                    backgroundColor: Colors.green,
-                    splashColor: Colors.white,
-                    foregroundColor: Colors.white,
-                    hoverColor: Colors.redAccent,
-                    onPressed: () {
-                      Navigator.pushNamed(context, 'cadastrar_cliente');
-                    },
-                    label: Text('Adicionar um novo Usuário'),
-                    icon: Icon(Icons.add),
+                  Visibility(
+                    visible: _largura >= 1000,
+                    child: FloatingActionButton.extended(
+                      backgroundColor: Colors.green,
+                      splashColor: Colors.white,
+                      foregroundColor: Colors.white,
+                      hoverColor: Colors.redAccent,
+                      onPressed: () {
+                        Navigator.pushNamed(context, 'cadastrar_cliente');
+                      },
+                      label: Text('Adicionar um novo Usuário'),
+                      icon: Icon(Icons.add),
+                    ),
+                    replacement: FloatingActionButton(
+                      backgroundColor: Colors.green,
+                      splashColor: Colors.white,
+                      foregroundColor: Colors.white,
+                      hoverColor: Colors.redAccent,
+                      child: Icon(Icons.add),
+                      onPressed: () {
+                        Navigator.pushNamed(context, 'cadastrar_cliente');
+                      },
+                    ),
                   ),
                   SizedBox(
                     width: 30,

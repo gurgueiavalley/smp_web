@@ -20,7 +20,9 @@ class Tela_BaseState extends State<TelaBase> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Row(
+      body: Flex(
+        direction: Axis.horizontal,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           NavigationRail(
             leading: Column(
@@ -66,7 +68,7 @@ class Tela_BaseState extends State<TelaBase> {
                 print(index);
               });
             },
-            labelType: MediaQuery.of(context).size.width > 1000
+            labelType: MediaQuery.of(context).size.width >= 1000
                 ? null
                 : NavigationRailLabelType.selected,
             destinations: [
