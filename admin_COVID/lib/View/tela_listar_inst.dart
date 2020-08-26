@@ -153,6 +153,7 @@ class _TelaListarInstituicaoState extends State<TelaListarInstituicao> {
                                             .nome,
                                       ),
                                       leading: CircleAvatar(
+                                        backgroundColor: Colors.white,
                                         backgroundImage: NetworkImage(
                                           InstituicaoModel.fromJson(d.data)
                                               .data

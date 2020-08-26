@@ -35,6 +35,7 @@ dependencies:
   firebase_storage:
   #file_picker: ^1.13.3
   file_picker_web:
+  universal_html: ^1.2.3
 
 
 dev_dependencies:

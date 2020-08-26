@@ -1,11 +1,12 @@
-import 'dart:html';
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:admin_chat/Controller/instituicaoController.dart';
 import 'package:admin_chat/Model/instituicao.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase/firebase.dart' as fb;
 import 'package:firebase/firestore.dart';
-import 'package:file_picker_web/file_picker_web.dart';
+import 'package:universal_html/prefer_universal/html.dart' as html;
 
 Firestore firestore = fb.firestore();
 
@@ -16,19 +17,13 @@ class TelaInstituicao extends StatefulWidget {
 
 class _TelaInstituicaoState extends State<TelaInstituicao> {
   ScrollController _scrollController = ScrollController();
-  File _image;
-  final reader = new FileReader();
   GlobalKey<FormState> _globalKey = GlobalKey();
   GlobalKey<ScaffoldState> _key = GlobalKey();
   TextEditingController _nome = TextEditingController();
   TextEditingController _descricao = TextEditingController();
   bool _carregando = false;
-
-  void _pickFiles() async {
-    _image = await FilePicker.getFile();
-    print(_image.relativePath);
-    setState(() {});
-  }
+  Uint8List data;
+  html.File fileImage;
 
   @override
   Widget build(BuildContext context) {
@@ -105,21 +100,9 @@ class _TelaInstituicaoState extends State<TelaInstituicao> {
                                     height: 230,
                                     width: 230,
                                     margin: EdgeInsets.only(bottom: 15),
-                                    decoration: BoxDecoration(
-                                      color: _image == null
-                                          ? Colors.grey
-                                          : Colors.white,
-                                      image: DecorationImage(
-                                        image: _image == null
-                                            ? NetworkImage(
-                                                'https://img.icons8.com/officel/2x/add-image.png',
-                                              )
-                                            : AssetImage(
-                                                'assets/carregada.jpg',
-                                              ),
-                                        //_image.relativePath
-                                      ),
-                                    ),
+                                    child: data == null
+                                        ? Image.asset('assets/add.png')
+                                        : Image.memory(data),
                                   ),
                                   Container(
                                     width: 230,
@@ -129,7 +112,8 @@ class _TelaInstituicaoState extends State<TelaInstituicao> {
                                       color: Colors.green,
                                       textColor: Colors.white,
                                       onPressed: () {
-                                        uploadImage();
+                                        //uploadImage();
+                                        pickImage();
                                       },
                                       icon: Icon(Icons.cloud_upload),
                                       label: AutoSizeText(
@@ -149,12 +133,6 @@ class _TelaInstituicaoState extends State<TelaInstituicao> {
                                   SizedBox(
                                     height: 10,
                                   ),
-                                  _image != null
-                                      ? Text(
-                                          'Nome da imagem: ' + _image.name,
-                                          style: TextStyle(color: Colors.green),
-                                        )
-                                      : Container()
                                 ],
                               ),
                             ),
@@ -205,7 +183,7 @@ class _TelaInstituicaoState extends State<TelaInstituicao> {
                                           onPressed: () async {
                                             if (_globalKey.currentState
                                                 .validate()) {
-                                              if (_image == null) {
+                                              if (fileImage == null) {
                                                 var snak = SnackBar(
                                                   content: Text(
                                                     'Adicione um logo!',
@@ -219,8 +197,7 @@ class _TelaInstituicaoState extends State<TelaInstituicao> {
                                                 _carregando = true;
                                                 setState(() {});
                                                 String url_img =
-                                                    await uploadToFirebase(
-                                                        _image);
+                                                    await uploadToFirebase();
                                               }
                                             }
 
@@ -254,55 +231,59 @@ class _TelaInstituicaoState extends State<TelaInstituicao> {
     );
   }
 
-// pegando imagem
-  uploadImage() async {
-    await _pickFiles();
-    print('pegar imagem');
-  }
+  pickImage() {
+    final html.InputElement input = html.document.createElement('input');
+    input
+      ..type = 'file'
+      ..accept = 'image/*';
 
-  // upload dqa
-  fb.UploadTask _uploadTask;
+    input.onChange.listen((e) {
+      if (input.files.isEmpty) return;
+      final reader = html.FileReader();
+      fileImage = input.files.first;
+      reader.readAsDataUrl(input.files[0]);
+      reader.onError.listen((err) => setState(() {}));
+      reader.onLoad.first.then((res) {
+        final encoded = reader.result as String;
+        // remove data:image/*;base64 preambule
+        final stripped =
+            encoded.replaceFirst(RegExp(r'data:image/[^;]+;base64,'), '');
 
-  uploadToFirebase(File imageFile) async {
-    String nome_image = DateTime.now().toString();
-    String url_imagem;
-
-    final filePath = 'ImagemAdministradorWeb/$nome_image';
-    _uploadTask = fb
-        .storage()
-        .refFromURL('gs://covid-4f1af.appspot.com')
-        .child(filePath)
-        .put(imageFile);
-
-    _uploadTask.future.asStream().listen((event) async {
-      print('entrou');
-      double progresso =
-          event != null ? event.bytesTransferred / event.totalBytes * 100 : 0;
-      if (progresso == 100) {
-        print('sucesso');
-        var url = await (event).ref.getDownloadURL();
-        url_imagem = url.toString();
-
-        print(url_imagem);
-        await InstituicaoController().cadastrar(
-          Instituicoes(
-            nome: _nome.text,
-            descricao: _descricao.text,
-            img: url_imagem,
-            nomeImg: nome_image,
-          ),
-        );
-
-        _nome.text = '';
-        _descricao.text = '';
-        Navigator.pop(context);
-
-        if (url != null) {
-          print('entrou');
-        }
-      }
+        setState(() {
+          data = base64.decode(stripped);
+        });
+      });
     });
 
-    setState(() {});
+    input.click();
+  }
+
+  // upload da imagem para o firebase
+  uploadToFirebase() async {
+    String nome_image = DateTime.now().toString();
+
+    fb.StorageReference storageRef = fb.storage().ref(
+          'ImagemAdministradorWeb/$nome_image',
+        );
+    fb.UploadTaskSnapshot uploadTaskSnapshot =
+        await storageRef.put(fileImage).future;
+
+    Uri imageUri = await uploadTaskSnapshot.ref.getDownloadURL();
+    String url = imageUri.toString();
+    print('Nova url');
+    print(url);
+
+    await InstituicaoController().cadastrar(
+      Instituicoes(
+        nome: _nome.text,
+        descricao: _descricao.text,
+        img: url,
+        nomeImg: nome_image,
+      ),
+    );
+
+    _nome.text = '';
+    _descricao.text = '';
+    Navigator.pop(context);
   }
 }

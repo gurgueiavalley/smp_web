@@ -1,4 +1,5 @@
-import 'dart:html';
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:admin_chat/Controller/instituicaoController.dart';
 import 'package:admin_chat/Model/instituicao.dart';
 import 'package:admin_chat/View/componentes.dart/carregando.dart';
@@ -6,10 +7,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase/firebase.dart' as fb;
-import 'package:firebase/firestore.dart';
-import 'package:file_picker_web/file_picker_web.dart';
-
-Firestore firestore = fb.firestore();
+import 'package:universal_html/prefer_universal/html.dart' as html;
 
 class TelaAlterarInstituicao extends StatefulWidget {
   final Instituicoes instituicoes;
@@ -21,8 +19,6 @@ class TelaAlterarInstituicao extends StatefulWidget {
 
 class _TelaAlterarInstituicaoState extends State<TelaAlterarInstituicao> {
   ScrollController _scrollController = ScrollController();
-  File _image;
-  final reader = new FileReader();
   GlobalKey<FormState> _globalKey = GlobalKey();
   GlobalKey<ScaffoldState> _key = GlobalKey();
   TextEditingController _nome = TextEditingController();
@@ -31,11 +27,8 @@ class _TelaAlterarInstituicaoState extends State<TelaAlterarInstituicao> {
   String _url_img;
   bool _editar = false;
 
-  void _pickFiles() async {
-    _image = await FilePicker.getFile();
-    print(_image.relativePath);
-    setState(() {});
-  }
+  Uint8List data;
+  html.File fileImage;
 
   @override
   void initState() {
@@ -122,17 +115,13 @@ class _TelaAlterarInstituicaoState extends State<TelaAlterarInstituicao> {
                                     width: 230,
                                     margin: EdgeInsets.only(bottom: 15),
                                     decoration: BoxDecoration(
-                                      color: _image == null
-                                          ? Colors.grey
-                                          : Colors.white,
+                                      color: Colors.white,
                                       image: DecorationImage(
-                                        image: _image == null
+                                        image: fileImage == null
                                             ? NetworkImage(
                                                 _url_img,
                                               )
-                                            : AssetImage(
-                                                'assets/carregada.jpg',
-                                              ),
+                                            : MemoryImage(data),
                                         //_image.relativePath
                                       ),
                                     ),
@@ -146,7 +135,7 @@ class _TelaAlterarInstituicaoState extends State<TelaAlterarInstituicao> {
                                       textColor: Colors.white,
                                       onPressed: _editar
                                           ? () {
-                                              uploadImage();
+                                              pickImage();
                                             }
                                           : null,
                                       icon: Icon(Icons.cloud_upload),
@@ -167,12 +156,6 @@ class _TelaAlterarInstituicaoState extends State<TelaAlterarInstituicao> {
                                   SizedBox(
                                     height: 10,
                                   ),
-                                  _image != null
-                                      ? Text(
-                                          'Nome da imagem: ' + _image.name,
-                                          style: TextStyle(color: Colors.green),
-                                        )
-                                      : Container()
                                 ],
                               ),
                             ),
@@ -320,7 +303,7 @@ class _TelaAlterarInstituicaoState extends State<TelaAlterarInstituicao> {
 
                                                   if (_globalKey.currentState
                                                       .validate()) {
-                                                    if (_image == null) {
+                                                    if (fileImage == null) {
                                                       print(
                                                         'alterar sem imagem',
                                                       );
@@ -344,9 +327,7 @@ class _TelaAlterarInstituicaoState extends State<TelaAlterarInstituicao> {
                                                       setState(() {});
 
                                                       await excluirImagem();
-                                                      await uploadToFirebase(
-                                                        _image,
-                                                      );
+                                                      await uploadToFirebase();
                                                     }
                                                   }
                                                 },
@@ -381,56 +362,61 @@ class _TelaAlterarInstituicaoState extends State<TelaAlterarInstituicao> {
     );
   }
 
-// pegando imagem
-  uploadImage() async {
-    await _pickFiles();
-    print('pegar imagem');
+  // pegando imagem
+  pickImage() {
+    final html.InputElement input = html.document.createElement('input');
+    input
+      ..type = 'file'
+      ..accept = 'image/*';
+
+    input.onChange.listen((e) {
+      if (input.files.isEmpty) return;
+      final reader = html.FileReader();
+      fileImage = input.files.first;
+      reader.readAsDataUrl(input.files[0]);
+      reader.onError.listen((err) => setState(() {}));
+      reader.onLoad.first.then((res) {
+        final encoded = reader.result as String;
+        // remove data:image/*;base64 preambule
+        final stripped =
+            encoded.replaceFirst(RegExp(r'data:image/[^;]+;base64,'), '');
+
+        setState(() {
+          data = base64.decode(stripped);
+        });
+      });
+    });
+    input.click();
   }
 
-  // upload dqa
-  fb.UploadTask _uploadTask;
-
-  Future<bool> uploadToFirebase(File imageFile) async {
+  // upload da imagem para o firebase
+  Future<bool> uploadToFirebase() async {
     String nome_image = DateTime.now().toString();
-    String url_imagem;
 
-    final filePath = 'ImagemAdministradorWeb/$nome_image';
-    _uploadTask = fb
-        .storage()
-        .refFromURL('gs://covid-4f1af.appspot.com')
-        .child(filePath)
-        .put(imageFile);
-
-    _uploadTask.future.asStream().listen((event) async {
-      print('entrou');
-      double progresso =
-          event != null ? event.bytesTransferred / event.totalBytes * 100 : 0;
-      if (progresso == 100) {
-        print('sucesso');
-        var url = await (event).ref.getDownloadURL();
-        url_imagem = url.toString();
-
-        print(url_imagem);
-        await InstituicaoController().alterarComImgem(
-          widget.instituicoes.id,
-          Instituicoes(
-            nome: _nome.text,
-            descricao: _descricao.text,
-            img: url_imagem,
-            nomeImg: nome_image,
-          ),
+    fb.StorageReference storageRef = fb.storage().ref(
+          'ImagemAdministradorWeb/$nome_image',
         );
+    fb.UploadTaskSnapshot uploadTaskSnapshot =
+        await storageRef.put(fileImage).future;
 
-        _nome.text = '';
-        _descricao.text = '';
-        Navigator.pop(context);
+    Uri imageUri = await uploadTaskSnapshot.ref.getDownloadURL();
+    String url = imageUri.toString();
+    print('Nova url');
+    print(url);
 
-        if (url != null) {
-          print('entrou');
-        }
-      }
-    });
+    await InstituicaoController().alterarComImgem(
+      widget.instituicoes.id,
+      Instituicoes(
+        nome: _nome.text,
+        descricao: _descricao.text,
+        img: url,
+        nomeImg: nome_image,
+      ),
+    );
 
+    _nome.text = '';
+    _descricao.text = '';
+    Navigator.pop(context);
     setState(() {});
     return true;
   }
