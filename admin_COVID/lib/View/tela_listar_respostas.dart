@@ -16,6 +16,8 @@ class _TelaListarRespostasState extends State<TelaListarRespostas> {
 
   @override
   Widget build(BuildContext context) {
+    double _largura = MediaQuery.of(context).size.width;
+
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         label: Text('Inicio'),
@@ -40,8 +42,8 @@ class _TelaListarRespostasState extends State<TelaListarRespostas> {
               SizedBox(
                 height: 50,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+              Flex(
+                direction: Axis.horizontal,
                 children: [
                   Icon(Icons.search),
                   SizedBox(
@@ -54,6 +56,33 @@ class _TelaListarRespostasState extends State<TelaListarRespostas> {
                     ),
                   ),
                   Expanded(child: Container()),
+<<<<<<< HEAD:admin_COVID/lib/View/tela_listar_respostas.dart
+=======
+                  Visibility(
+                    visible: _largura >= 1000,
+                    child: FloatingActionButton.extended(
+                      backgroundColor: Colors.green,
+                      splashColor: Colors.white,
+                      foregroundColor: Colors.white,
+                      hoverColor: Colors.redAccent,
+                      onPressed: () {
+                        Navigator.pushNamed(context, 'cadastrar_cliente');
+                      },
+                      label: Text('Adicionar um novo Usuário'),
+                      icon: Icon(Icons.add),
+                    ),
+                    replacement: FloatingActionButton(
+                      backgroundColor: Colors.green,
+                      splashColor: Colors.white,
+                      foregroundColor: Colors.white,
+                      hoverColor: Colors.redAccent,
+                      child: Icon(Icons.add),
+                      onPressed: () {
+                        Navigator.pushNamed(context, 'cadastrar_cliente');
+                      },
+                    ),
+                  ),
+>>>>>>> 22c0a3d7579edbc0cd35cec41cfb75f5568159b3:admin_COVID/lib/View/tela_cliente.dart
                   SizedBox(
                     width: 30,
                   )
