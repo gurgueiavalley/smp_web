@@ -1,6 +1,5 @@
 import 'package:admin_chat/Model/instituicao.dart';
 import 'package:admin_chat/Query/queryInstituicao.dart';
-import 'package:admin_chat/View/tela_instituicoes.dart';
 import 'package:admin_chat/constants.dart';
 import 'package:flutter/material.dart';
 

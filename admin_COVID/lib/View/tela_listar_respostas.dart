@@ -1,17 +1,16 @@
-import 'dart:html';
 import 'package:admin_chat/Model/cliente.dart';
-import 'package:admin_chat/Query/queryCliente.dart';
-import 'package:admin_chat/View/tela_cad_cliente.dart';
+import 'package:admin_chat/Model/resposta.dart';
+import 'package:admin_chat/Query/queryResposta.dart';
 import 'package:admin_chat/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-class TelaCliente extends StatefulWidget {
+class TelaListarRespostas extends StatefulWidget {
   @override
-  _TelaClienteState createState() => _TelaClienteState();
+  _TelaListarRespostasState createState() => _TelaListarRespostasState();
 }
 
-class _TelaClienteState extends State<TelaCliente> {
+class _TelaListarRespostasState extends State<TelaListarRespostas> {
   ScrollController _scrollController = ScrollController();
   TextEditingController _editingController = TextEditingController();
 
@@ -49,30 +48,19 @@ class _TelaClienteState extends State<TelaCliente> {
                     width: 10,
                   ),
                   Text(
-                    'Pesquisar Usuários',
+                    'Filtar por Níveis de Casos',
                     style: TextStyle(
                       fontSize: 25,
                     ),
                   ),
                   Expanded(child: Container()),
-                  FloatingActionButton.extended(
-                    backgroundColor: Colors.green,
-                    splashColor: Colors.white,
-                    foregroundColor: Colors.white,
-                    hoverColor: Colors.redAccent,
-                    onPressed: () {
-                      Navigator.pushNamed(context, 'cadastrar_cliente');
-                    },
-                    label: Text('Adicionar um novo Usuário'),
-                    icon: Icon(Icons.add),
-                  ),
                   SizedBox(
                     width: 30,
                   )
                 ],
               ),
               Text(
-                'Busque por Usuários',
+                'Busque por nível',
               ),
               SizedBox(
                 height: 50,
@@ -100,7 +88,7 @@ class _TelaClienteState extends State<TelaCliente> {
                                 prefixIcon: Icon(
                                   Icons.search,
                                 ),
-                                hintText: 'Digite o nome do Usuário',
+                                hintText: 'Digite o nível',
                                 suffixIcon: IconButton(
                                   icon: Icon(Icons.clear),
                                   onPressed: () {
@@ -112,26 +100,26 @@ class _TelaClienteState extends State<TelaCliente> {
                         ),
                         StreamBuilder(
                           stream: hasuraConnect.subscription(
-                            ClienteQuery().queryListarCliente(),
+                            RespostaQuery().queryListarResposta(),
                           ),
                           builder: (_, d) {
                             if (d.hasData) {
                               return ListView.builder(
                                 shrinkWrap: true,
-                                itemCount: ClienteModel.fromJson(d.data)
+                                itemCount: RespostaModel.fromJson(d.data)
                                     .data
-                                    .clientes
+                                    .respostas
                                     .length,
                                 itemBuilder: (_, i) {
-                                  if (ClienteModel.fromJson(d.data)
+                                  if (RespostaModel.fromJson(d.data)
                                       .data
-                                      .clientes
+                                      .respostas
                                       .elementAt(i)
-                                      .login
+                                      .resposta
                                       .contains(_editingController.text)) {
                                     return ListTile(
                                       title: Text(
-                                        'Usuário: ${ClienteModel.fromJson(d.data).data.clientes.elementAt(i).login}',
+                                        'Nível: ${RespostaModel.fromJson(d.data).data.respostas.elementAt(i).resposta}',
                                       ),
                                       leading: CircleAvatar(
                                         backgroundColor: Colors.black45,
@@ -141,7 +129,7 @@ class _TelaClienteState extends State<TelaCliente> {
                                         ),
                                       ),
                                       subtitle: Text(
-                                          'Senha: ${ClienteModel.fromJson(d.data).data.clientes.elementAt(i).senha}'),
+                                          'ID: ${RespostaModel.fromJson(d.data).data.respostas.elementAt(i).id}'),
                                       onTap: () {
                                         Navigator.pushNamed(
                                           context,

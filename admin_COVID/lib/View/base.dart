@@ -1,10 +1,4 @@
-import 'package:admin_chat/Model/instituicao.dart';
-import 'package:admin_chat/View/tela_cliente.dart';
-import 'package:admin_chat/View/tela_instituicoes.dart';
-import 'package:admin_chat/View/tela_listar_inst.dart';
-import 'package:admin_chat/View/teste.dart';
-import 'package:admin_chat/constants.dart';
-import 'package:flutter/gestures.dart';
+import 'package:admin_chat/View/tela_listar_respostas.dart';
 import 'package:flutter/material.dart';
 import 'package:icofont_flutter/icofont_flutter.dart';
 
@@ -71,14 +65,14 @@ class Tela_BaseState extends State<TelaBase> {
                 : NavigationRailLabelType.selected,
             destinations: [
               NavigationRailDestination(
-                icon: Icon(IcoFontIcons.doctor),
-                selectedIcon: Icon(IcoFontIcons.doctor),
-                label: Text('Usuário'),
+                icon: Icon(IcoFontIcons.filter),
+                selectedIcon: Icon(IcoFontIcons.filter),
+                label: Text('Filtros'),
               ),
               NavigationRailDestination(
-                icon: Icon(IcoFontIcons.institution),
-                selectedIcon: Icon(IcoFontIcons.institution),
-                label: Text('Instituições'),
+                icon: Icon(IcoFontIcons.signOut),
+                selectedIcon: Icon(IcoFontIcons.signOut),
+                label: Text('Sair'),
               ),
             ],
           ),
@@ -108,9 +102,12 @@ class Tela_BaseState extends State<TelaBase> {
   Widget pages() {
     switch (_selectedIndex) {
       case 0:
-        return TelaCliente();
+        return TelaListarRespostas();
+        break;
       case 1:
-        return TelaListarInstituicao();
+        //Navigator.pushReplacement(
+        //context, MaterialPageRoute(builder: (context) => SignInCliente()));
+        Navigator.pushReplacementNamed(context, '/');
         break;
       default:
     }
