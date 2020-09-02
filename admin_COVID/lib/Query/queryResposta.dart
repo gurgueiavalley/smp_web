@@ -3,7 +3,11 @@ import 'package:hasura_connect/hasura_connect.dart';
 
 class RespostaQuery {
   // listar
+<<<<<<< HEAD
 /*   String queryListarResposta() {
+=======
+  String queryListarResposta() {
+>>>>>>> 39d6b0c83558061c58ca98e0345c63815e06aea4
     String query = """
       subscription MySubscription {
       respostas {
@@ -15,6 +19,7 @@ class RespostaQuery {
 
     return query;
   }
+<<<<<<< HEAD
 } */
 
 // listar
@@ -35,6 +40,9 @@ class RespostaQuery {
 
     return query;
   }
+=======
+}
+>>>>>>> 39d6b0c83558061c58ca98e0345c63815e06aea4
 
 /*
 query MyQuery {
@@ -50,5 +58,8 @@ query MyQuery {
   }
 }
  */
+<<<<<<< HEAD
 
 }
+=======
+>>>>>>> 39d6b0c83558061c58ca98e0345c63815e06aea4

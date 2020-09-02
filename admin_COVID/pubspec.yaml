@@ -35,7 +35,15 @@ dependencies:
   firebase_storage:
   #file_picker: ^1.13.3
   file_picker_web:
+<<<<<<< HEAD
   json_annotation: ^3.0.0
+=======
+<<<<<<< HEAD
+  json_annotation: ^3.0.0
+=======
+  universal_html: ^1.2.3
+>>>>>>> 22c0a3d7579edbc0cd35cec41cfb75f5568159b3
+>>>>>>> 39d6b0c83558061c58ca98e0345c63815e06aea4
 
 
 dev_dependencies:

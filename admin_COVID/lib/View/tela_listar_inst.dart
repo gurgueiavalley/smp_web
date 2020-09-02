@@ -15,6 +15,7 @@ class _TelaListarInstituicaoState extends State<TelaListarInstituicao> {
 
   @override
   Widget build(BuildContext context) {
+    double _largura = MediaQuery.of(context).size.width;
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
         label: Text('Inicio'),
@@ -39,8 +40,8 @@ class _TelaListarInstituicaoState extends State<TelaListarInstituicao> {
               SizedBox(
                 height: 50,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+              Flex(
+                direction: Axis.horizontal,
                 children: [
                   Icon(Icons.search),
                   SizedBox(
@@ -53,16 +54,29 @@ class _TelaListarInstituicaoState extends State<TelaListarInstituicao> {
                     ),
                   ),
                   Expanded(child: Container()),
-                  FloatingActionButton.extended(
-                    backgroundColor: Colors.green,
-                    splashColor: Colors.white,
-                    foregroundColor: Colors.white,
-                    hoverColor: Colors.redAccent,
-                    onPressed: () {
-                      Navigator.pushNamed(context, 'cadastrar_instituicao');
-                    },
-                    label: Text('Adicionar nova Instituição'),
-                    icon: Icon(Icons.add),
+                  Visibility(
+                    visible: _largura >= 1000,
+                    child: FloatingActionButton.extended(
+                      backgroundColor: Colors.green,
+                      splashColor: Colors.white,
+                      foregroundColor: Colors.white,
+                      hoverColor: Colors.redAccent,
+                      onPressed: () {
+                        Navigator.pushNamed(context, 'cadastrar_instituicao');
+                      },
+                      label: Text('Adicionar nova Instituição'),
+                      icon: Icon(Icons.add),
+                    ),
+                    replacement: FloatingActionButton(
+                      backgroundColor: Colors.green,
+                      splashColor: Colors.white,
+                      foregroundColor: Colors.white,
+                      hoverColor: Colors.redAccent,
+                      child: Icon(Icons.add),
+                      onPressed: () {
+                        Navigator.pushNamed(context, 'cadastrar_instituicao');
+                      },
+                    ),
                   ),
                   SizedBox(
                     width: 30,
@@ -138,6 +152,7 @@ class _TelaListarInstituicaoState extends State<TelaListarInstituicao> {
                                             .nome,
                                       ),
                                       leading: CircleAvatar(
+                                        backgroundColor: Colors.white,
                                         backgroundImage: NetworkImage(
                                           InstituicaoModel.fromJson(d.data)
                                               .data

@@ -79,7 +79,10 @@ class ClienteQuery {
         clientes(where: {login: {_eq: "$login"}, senha: {_eq: "$senha"}}) {
           login
           senha
+<<<<<<< HEAD
           idInstituicao
+=======
+>>>>>>> 39d6b0c83558061c58ca98e0345c63815e06aea4
         }
       }   
     """;

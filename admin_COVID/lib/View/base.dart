@@ -1,5 +1,8 @@
 import 'package:admin_chat/View/tela_listar_respostas.dart';
+<<<<<<< HEAD
 import 'package:admin_chat/constants.dart';
+=======
+>>>>>>> 39d6b0c83558061c58ca98e0345c63815e06aea4
 import 'package:flutter/material.dart';
 import 'package:icofont_flutter/icofont_flutter.dart';
 
@@ -15,7 +18,9 @@ class Tela_BaseState extends State<TelaBase> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Row(
+      body: Flex(
+        direction: Axis.horizontal,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           NavigationRail(
             leading: Column(
@@ -62,7 +67,7 @@ class Tela_BaseState extends State<TelaBase> {
                 print(index);
               });
             },
-            labelType: MediaQuery.of(context).size.width > 1000
+            labelType: MediaQuery.of(context).size.width >= 1000
                 ? null
                 : NavigationRailLabelType.selected,
             destinations: [
@@ -105,6 +110,14 @@ class Tela_BaseState extends State<TelaBase> {
     switch (_selectedIndex) {
       case 0:
         return TelaListarRespostas();
+<<<<<<< HEAD
+=======
+        break;
+      case 1:
+        //Navigator.pushReplacement(
+        //context, MaterialPageRoute(builder: (context) => SignInCliente()));
+        Navigator.pushReplacementNamed(context, '/');
+>>>>>>> 39d6b0c83558061c58ca98e0345c63815e06aea4
         break;
       default:
     }
