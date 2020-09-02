@@ -71,4 +71,32 @@ class ClienteQuery {
     var res = await hasuraConnect.mutation(query);
     return true;
   }
+
+  // verificar login/senha
+  queryLoginCliente(String login, String senha) {
+    String query = """
+      query MyQuery {
+        clientes(where: {login: {_eq: "$login"}, senha: {_eq: "$senha"}}) {
+          login
+          senha
+          idInstituicao
+        }
+      }   
+    """;
+    return query;
+  }
+
+  // verificar login/senha
+  queryLogin() {
+    String query = """
+      query MyQuery {
+        clientes {
+          login
+          senha
+        }
+      }   
+    """;
+
+    return query;
+  }
 }

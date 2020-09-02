@@ -1,12 +1,5 @@
-import 'package:admin_chat/Model/cliente.dart';
-import 'package:admin_chat/View/base.dart';
-import 'package:admin_chat/View/tela_alterar_cliente.dart';
-import 'package:admin_chat/View/tela_alterar_instituicao.dart';
-import 'package:admin_chat/View/tela_cad_cliente.dart';
-import 'package:admin_chat/View/tela_instituicoes.dart';
-import 'package:admin_chat/constants.dart';
+import 'package:admin_chat/View/tela_login_cliente.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_web_scrollbar/flutter_web_scrollbar.dart';
 import 'package:firebase/firebase.dart' as fb;
 
 void main() {
@@ -37,15 +30,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => TelaBase(),
-        'cadastrar_cliente': (context) => TelaCadCliente(),
-        'cadastrar_instituicao': (context) => TelaInstituicao(),
-        'alterar_cliente': (context) => TelaAlterarCliente(
-              clientes: ModalRoute.of(context).settings.arguments,
-            ),
-        'alterar_instituicao': (context) => TelaAlterarInstituicao(
-              instituicoes: ModalRoute.of(context).settings.arguments,
-            ),
+        '/': (context) => SignInCliente(),
       },
     );
   }

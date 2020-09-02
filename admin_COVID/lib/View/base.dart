@@ -1,10 +1,5 @@
-import 'package:admin_chat/Model/instituicao.dart';
-import 'package:admin_chat/View/tela_cliente.dart';
-import 'package:admin_chat/View/tela_instituicoes.dart';
-import 'package:admin_chat/View/tela_listar_inst.dart';
-import 'package:admin_chat/View/teste.dart';
+import 'package:admin_chat/View/tela_listar_respostas.dart';
 import 'package:admin_chat/constants.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:icofont_flutter/icofont_flutter.dart';
 
@@ -29,16 +24,14 @@ class Tela_BaseState extends State<TelaBase> {
                   padding: const EdgeInsets.all(8.0),
                   child: CircleAvatar(
                     radius: MediaQuery.of(context).size.width * 0.04,
-                    backgroundImage: NetworkImage(
-                      'https://cdni.rt.com/actualidad/public_images/2016.07/article/579ae067c36188ce6e8b4576.jpg',
-                    ),
+                    child: Icon(Icons.person),
                   ),
                 ),
                 SizedBox(
                   height: 10,
                 ),
                 Text(
-                  'Maria',
+                  '$nome',
                   style: TextStyle(
                     color: Colors.blueAccent,
                     fontSize: 20,
@@ -62,7 +55,10 @@ class Tela_BaseState extends State<TelaBase> {
             extended: MediaQuery.of(context).size.width >= 1000 ? true : false,
             onDestinationSelected: (int index) {
               setState(() {
-                _selectedIndex = index;
+                if (index == 1) {
+                  Navigator.pushReplacementNamed(context, '/');
+                }
+                _selectedIndex = index != 1 ? index : _selectedIndex;
                 print(index);
               });
             },
@@ -71,14 +67,14 @@ class Tela_BaseState extends State<TelaBase> {
                 : NavigationRailLabelType.selected,
             destinations: [
               NavigationRailDestination(
-                icon: Icon(IcoFontIcons.doctor),
-                selectedIcon: Icon(IcoFontIcons.doctor),
-                label: Text('Usuário'),
+                icon: Icon(IcoFontIcons.filter),
+                selectedIcon: Icon(IcoFontIcons.filter),
+                label: Text('Filtros'),
               ),
               NavigationRailDestination(
-                icon: Icon(IcoFontIcons.institution),
-                selectedIcon: Icon(IcoFontIcons.institution),
-                label: Text('Instituições'),
+                icon: Icon(IcoFontIcons.signOut),
+                selectedIcon: Icon(IcoFontIcons.signOut),
+                label: Text('Sair'),
               ),
             ],
           ),
@@ -108,9 +104,7 @@ class Tela_BaseState extends State<TelaBase> {
   Widget pages() {
     switch (_selectedIndex) {
       case 0:
-        return TelaCliente();
-      case 1:
-        return TelaListarInstituicao();
+        return TelaListarRespostas();
         break;
       default:
     }

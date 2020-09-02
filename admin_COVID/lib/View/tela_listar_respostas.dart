@@ -1,17 +1,17 @@
-import 'dart:html';
 import 'package:admin_chat/Model/cliente.dart';
-import 'package:admin_chat/Query/queryCliente.dart';
-import 'package:admin_chat/View/tela_cad_cliente.dart';
+import 'package:admin_chat/Model/resposta.dart';
+import 'package:admin_chat/Model/usuario.dart';
+import 'package:admin_chat/Query/queryResposta.dart';
 import 'package:admin_chat/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-class TelaCliente extends StatefulWidget {
+class TelaListarRespostas extends StatefulWidget {
   @override
-  _TelaClienteState createState() => _TelaClienteState();
+  _TelaListarRespostasState createState() => _TelaListarRespostasState();
 }
 
-class _TelaClienteState extends State<TelaCliente> {
+class _TelaListarRespostasState extends State<TelaListarRespostas> {
   ScrollController _scrollController = ScrollController();
   TextEditingController _editingController = TextEditingController();
 
@@ -49,30 +49,19 @@ class _TelaClienteState extends State<TelaCliente> {
                     width: 10,
                   ),
                   Text(
-                    'Pesquisar Usuários',
+                    'Filtar por Níveis de Casos',
                     style: TextStyle(
                       fontSize: 25,
                     ),
                   ),
                   Expanded(child: Container()),
-                  FloatingActionButton.extended(
-                    backgroundColor: Colors.green,
-                    splashColor: Colors.white,
-                    foregroundColor: Colors.white,
-                    hoverColor: Colors.redAccent,
-                    onPressed: () {
-                      Navigator.pushNamed(context, 'cadastrar_cliente');
-                    },
-                    label: Text('Adicionar um novo Usuário'),
-                    icon: Icon(Icons.add),
-                  ),
                   SizedBox(
                     width: 30,
                   )
                 ],
               ),
               Text(
-                'Busque por Usuários',
+                'Busque por nível',
               ),
               SizedBox(
                 height: 50,
@@ -100,7 +89,7 @@ class _TelaClienteState extends State<TelaCliente> {
                                 prefixIcon: Icon(
                                   Icons.search,
                                 ),
-                                hintText: 'Digite o nome do Usuário',
+                                hintText: 'Digite o nível',
                                 suffixIcon: IconButton(
                                   icon: Icon(Icons.clear),
                                   onPressed: () {
@@ -110,28 +99,30 @@ class _TelaClienteState extends State<TelaCliente> {
                                 )),
                           ),
                         ),
-                        StreamBuilder(
-                          stream: hasuraConnect.subscription(
-                            ClienteQuery().queryListarCliente(),
+                        FutureBuilder(
+                          future: hasuraConnect.query(
+                            RespostaQuery().queryListarResposta(idInstituicao),
                           ),
                           builder: (_, d) {
                             if (d.hasData) {
                               return ListView.builder(
                                 shrinkWrap: true,
-                                itemCount: ClienteModel.fromJson(d.data)
+                                itemCount: UsuarioModel.fromJson(d.data)
                                     .data
-                                    .clientes
+                                    .usuarios
                                     .length,
                                 itemBuilder: (_, i) {
-                                  if (ClienteModel.fromJson(d.data)
+                                  if (UsuarioModel.fromJson(d.data)
                                       .data
-                                      .clientes
+                                      .usuarios
                                       .elementAt(i)
-                                      .login
+                                      .respostas
+                                      .elementAt(0)
+                                      .resposta
                                       .contains(_editingController.text)) {
                                     return ListTile(
                                       title: Text(
-                                        'Usuário: ${ClienteModel.fromJson(d.data).data.clientes.elementAt(i).login}',
+                                        'Nível: ${UsuarioModel.fromJson(d.data).data.usuarios.elementAt(i).respostas.elementAt(0).resposta.toString()}',
                                       ),
                                       leading: CircleAvatar(
                                         backgroundColor: Colors.black45,
@@ -141,19 +132,9 @@ class _TelaClienteState extends State<TelaCliente> {
                                         ),
                                       ),
                                       subtitle: Text(
-                                          'Senha: ${ClienteModel.fromJson(d.data).data.clientes.elementAt(i).senha}'),
-                                      onTap: () {
-                                        Navigator.pushNamed(
-                                          context,
-                                          'alterar_cliente',
-                                          arguments:
-                                              ClienteModel.fromJson(d.data)
-                                                  .data
-                                                  .clientes
-                                                  .elementAt(i),
-                                        );
-                                      },
-                                      trailing: Icon(Icons.edit),
+                                          'Nome: ${UsuarioModel.fromJson(d.data).data.usuarios.elementAt(i).nome.toString()} \n' +
+                                              'Email: ${UsuarioModel.fromJson(d.data).data.usuarios.elementAt(i).email.toString()} '),
+                                      onTap: () {},
                                     );
                                   } else {
                                     return Container();
